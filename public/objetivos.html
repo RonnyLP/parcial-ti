@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Árbol de Objetivos Vertical - Ingeniería de Sistemas UNTELS</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0fdf4;
+            color: #0f172a;
+            padding: 25px;
+            overflow-x: auto;
+        }
+
+        .main-container {
+            min-width: 1450px;
+            max-width: 1750px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .academic-header {
+            text-align: center;
+            border-bottom: 4px double #065f46;
+            padding-bottom: 15px;
+            margin-bottom: 35px;
+        }
+
+        .academic-header h1 {
+            font-size: 22pt;
+            color: #065f46;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .academic-header h2 {
+            font-size: 14pt;
+            color: #1e3a8a;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .academic-header .meta {
+            font-size: 10pt;
+            color: #6b7280;
+            font-style: italic;
+            margin-top: 6px;
+        }
+
+        .section-tag {
+            background-color: #065f46;
+            color: white;
+            padding: 10px 15px;
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            border-left: 5px solid #10b981;
+        }
+
+        .legend-bar {
+            display: flex;
+            gap: 20px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 9.5pt;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .color-box { width: 15px; height: 15px; border-radius: 3px; }
+
+        .tree-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .tree-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: relative;
+        }
+
+        .connector-row {
+            width: 100%;
+            height: 30px;
+            position: relative;
+        }
+
+        .node-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .node-id {
+            font-size: 8.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .node-text {
+            font-size: 9.5pt;
+            line-height: 1.4;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .stakeholder {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 8pt;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: auto;
+        }
+
+        .fines-indirectos .node-card {
+            width: 180px;
+            border: 1.5px solid #94a3b8;
+            border-top: 4px solid #0f766e;
+            background-color: #f0fdfa;
+        }
+        .fines-indirectos .node-id { color: #0f766e; }
+
+        .fines-directos .node-card {
+            width: 270px;
+            border: 2px solid #a7f3d0;
+            border-top: 5px solid #10b981;
+            background-color: #ffffff;
+        }
+        .fines-directos .node-id { color: #047857; }
+
+        .objetivo-central-row {
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .objetivo-card {
+            width: 700px;
+            background-color: #f0fdf4;
+            border: 3px solid #059669;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.1);
+        }
+        .objetivo-card .node-id {
+            color: #ffffff;
+            background-color: #059669;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 10pt;
+            letter-spacing: 0.5px;
+        }
+        .objetivo-card .node-text {
+            font-size: 11.5pt;
+            font-weight: bold;
+            color: #064e3b;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .medios-directos .node-card {
+            width: 320px;
+            border: 2px solid #99f6e4;
+            border-top: 5px solid #0d9488;
+            background-color: #f0fdfa;
+        }
+        .medios-directos .node-id { color: #0f766e; }
+
+        .medios-indirectas .node-card {
+            width: 165px;
+            border: 1.5px solid #cbd5e1;
+            border-top: 4px solid #2dd4bf;
+            background-color: #fafafa;
+        }
+        .medios-indirectas .node-id { color: #0d9488; font-style: italic; }
+
+        .line-vertical-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background-color: #cbd5e1;
+        }
+        .line-vertical-center.green-line {
+            background-color: #a7f3d0;
+        }
+
+        .academic-footer {
+            margin-top: 40px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #059669;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 10pt;
+            color: #334155;
+            line-height: 1.5;
+        }
+        .academic-footer strong {
+            color: #0f172a;
+            display: block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .pillar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+        }
+        .sub-tier {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="academic-header">
+        <h1>Universidad Nacional Tecnológica de Lima Sur (UNTELS)</h1>
+        <h2>Ingeniería de Sistemas | Formulación y Evaluación de Proyectos de TI (Parcial 2026-II)</h2>
+        <div class="meta">Matriz de Objetivos SMART — Caso: Congreso Tecnológico Agile Mindset</div>
+    </div>
+
+    <div class="section-tag">
+        Representación Estricta del Árbol de Objetivos SMART (Fines Arriba ▲ / Medios Abajo ▼)
+    </div>
+
+    <div class="legend-bar">
+        <div class="legend-item"><div class="color-box" style="background-color: #0f766e;"></div><span>Fines Indirectos (Impacto Global)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #10b981;"></div><span>Fines Directos (Logros SMART)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #059669;"></div><span>OBJETIVO CENTRAL (Propósito SMART)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #0d9488;"></div><span>Medios Directos (Entregables)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #2dd4bf;"></div><span>Medios Indirectos (Líneas de Acción)</span></div>
+    </div>
+
+    <div class="tree-layout">
+        <div class="tree-row fines-indirectos">
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card">
+                    <span class="node-id">Fin Indirecto 1.1</span>
+                    <p class="node-text">Aumento del 25% en la empleabilidad de egresados en empresas de software top para 2028.</p>
+                    <span class="stakeholder">Empresas Empleadoras</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Fin Indirecto 1.2</span>
+                    <p class="node-text">Incremento del 15% en proyectos de tesis enfocados en desarrollo de productos en 2 años.</p>
+                    <span class="stakeholder">Dirección de Escuela</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card" style="width: 100%;">
+                    <span class="node-id">Fin Indirecto 2.1</span>
+                    <p class="node-text">Reducción del 30% en tiempos corporativos de onboarding ágil para egresados UNTELS.</p>
+                    <span class="stakeholder">Empresas Tech · Gremios TI</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card" style="width: 31%;">
+                    <span class="node-id">Fin Ind. 3.1</span>
+                    <p class="node-text">Logro del 100% de conformidad en criterios de innovación en auditorías ICACIT 2027.</p>
+                    <span class="stakeholder">MINEDU · SUNEDU</span>
+                </div>
+                <div class="node-card" style="width: 31%;">
+                    <span class="node-id">Fin Ind. 3.2</span>
+                    <p class="node-text">Incremento del 20% en postulantes de primera preferencia a la carrera en 3 años.</p>
+                    <span class="stakeholder">Comunidad Académica</span>
+                </div>
+                <div class="node-card" style="width: 31%;">
+                    <span class="node-id">Fin Ind. 3.3</span>
+                    <p class="node-text">Mantenimiento de un 80% de plana docente activa en innovación pedagógica al 2028.</p>
+                    <span class="stakeholder">Docentes</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card">
+                    <span class="node-id">Fin Indirecto 4.1</span>
+                    <p class="node-text">Uso comprobado del 90% de las licencias y laboratorios virtuales habilitados anualmente.</p>
+                    <span class="stakeholder">Área TI · Soporte</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Fin Indirecto 4.2</span>
+                    <p class="node-text">Captación de al menos 2 fondos semilla para incubar startups nacidas del congreso.</p>
+                    <span class="stakeholder">Autoridades</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card" style="width: 100%;">
+                    <span class="node-id">Fin Indirecto 5.1</span>
+                    <p class="node-text">Reducción de 6 meses en el tiempo promedio de retorno de inversión educativa familiar.</p>
+                    <span class="stakeholder">Familias</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="connector-row"><div class="line-vertical-center"></div></div>
+
+        <div class="tree-row fines-directos">
+            <div class="node-card">
+                <span class="node-id">Fin Directo 1</span>
+                <p class="node-text">Aumento del 40% en la tasa de estudiantes que aplican a certificaciones ágiles internacionales en los 6 meses posteriores al congreso.</p>
+                <span class="stakeholder">Egresados · Estudiantes</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Fin Directo 2</span>
+                <p class="node-text">El 70% de los participantes de último ciclo logran integrarse a células ágiles empresariales o pasantías en el transcurso de 1 año.</p>
+                <span class="stakeholder">Empresas Tech</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Fin Directo 3</span>
+                <p class="node-text">100% de los sílabos de proyectos de TI actualizados con frameworks ágiles y Lean Startup para el inicio del semestre 2027-I.</p>
+                <span class="stakeholder">Docentes · Autoridades</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Fin Directo 4</span>
+                <p class="node-text">Participación activa de al menos 150 estudiantes en hackathons y dinámicas prácticas de entrega de valor durante el evento.</p>
+                <span class="stakeholder">Equipo Org. · Estudiantes</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Fin Directo 5</span>
+                <p class="node-text">Ejecución de al menos 3 proyectos de extensión basados en MVPs funcionales para MYPES de Lima Sur al finalizar el congreso.</p>
+                <span class="stakeholder">Sociedad Civil</span>
+            </div>
+        </div>
+
+        <div class="connector-row"><div class="line-vertical-center green-line"></div></div>
+
+        <div class="tree-row objetivo-central-row">
+            <div class="node-card objetivo-card">
+                <span class="node-id">🎯 OBJETIVO CENTRAL (PROPÓSITO SMART)</span>
+                <div class="node-text">
+                    Para noviembre de 2026, al menos el 80% de los estudiantes asistentes al Congreso Agile Mindset UNTELS adquieren competencias prácticas y certificables en frameworks (Scrum, Kanban, Lean Startup) para liderar entregas iterativas de valor en entornos empresariales reales.
+                </div>
+            </div>
+        </div>
+
+        <div class="connector-row"><div class="line-vertical-center green-line"></div></div>
+
+        <div class="tree-row medios-directos">
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Medio Directo 1 (Procesos)</span>
+                    <p class="node-text">Ejecución de 4 talleres prácticos intensivos sobre metodologías de descubrimiento y entrega iterativa para el cierre de octubre 2026.</p>
+                    <span class="stakeholder">Docentes · Autoridades</span>
+                </div>
+            </div>
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Medio Directo 2 (Infraestructura)</span>
+                    <p class="node-text">Habilitación operativa al 100% de 1 plataforma colaborativa general y 3 laboratorios virtuales 30 días antes del congreso.</p>
+                    <span class="stakeholder">Coordinadores · Área TI</span>
+                </div>
+            </div>
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Medio Directo 3 (Vinculación)</span>
+                    <p class="node-text">Formalización de 3 alianzas estratégicas con empresas de software para proveer casos reales durante el evento a septiembre 2026.</p>
+                    <span class="stakeholder">Autoridades · Empresas Tech</span>
+                </div>
+            </div>
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Medio Directo 4 (Cultura)</span>
+                    <p class="node-text">Creación y despliegue activo de 2 comunidades de práctica estudiantil orientadas a agilidad un mes antes del inicio del congreso.</p>
+                    <span class="stakeholder">Estudiantes · Equipo Org.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="connector-row"><div class="line-vertical-center"></div></div>
+
+        <div class="tree-row medios-indirectas">
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 1.1</span>
+                    <p class="node-text">Certificación confirmada del 70% de la plana docente facilitadora en Scrum o Kanban antes de septiembre 2026.</p>
+                    <span class="stakeholder">Docentes</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 1.2</span>
+                    <p class="node-text">Adaptación formal de 5 sílabos troncales hacia metodologías de evaluación basadas en MVPs para agosto 2026.</p>
+                    <span class="stakeholder">Docentes · Autoridades</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 2.1</span>
+                    <p class="node-text">Aprobación y desembolso del 100% del presupuesto operativo ágil para el evento durante el tercer trimestre de 2026.</p>
+                    <span class="stakeholder">Autoridades · Finanzas</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 2.2</span>
+                    <p class="node-text">Adquisición y asignación de 300 licencias de herramientas (Jira, Miro Premium) para asistentes en octubre 2026.</p>
+                    <span class="stakeholder">Área TI</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 3.1</span>
+                    <p class="node-text">Firma de 5 convenios específicos para integrar problemas de la industria real como base de los talleres del congreso.</p>
+                    <span class="stakeholder">Autoridades</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 3.2</span>
+                    <p class="node-text">Despliegue de 1 bolsa de talento y observatorio tecnológico apoyado por 10 empresas fundadoras para noviembre 2026.</p>
+                    <span class="stakeholder">Administración · Empresas</span>
+                </div>
+            </div>
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 4.1</span>
+                    <p class="node-text">Diseño e implementación de 1 proyecto integrador transversal ejecutado ininterrumpidamente en el semestre 2026-II.</p>
+                    <span class="stakeholder">Estudiantes</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Medio Indirecto 4.2</span>
+                    <p class="node-text">Impartición masiva de 3 talleres de inducción (Lean Startup y Design Thinking) previos al congreso para 200 alumnos.</p>
+                    <span class="stakeholder">Equipo Org. · Alumnos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="academic-footer">
+        <strong>Consistencia de la Inversión Analítica — Enfoque de Marco Lógico (MML) y Criterio SMART</strong>
+        Este diagrama representa la estructura formal del Árbol de Objetivos, operando como una inversión directa y biunívoca (1:1) de los estados negativos del Árbol de Problemas. Adicionalmente, todos los niveles de intervención han sido recalibrados bajo los lineamientos metodológicos SMART. Cada objetivo central, entregable (medio) y meta (fin) ahora especifica una cantidad medible (Measurable) y establece un horizonte temporal o condición de cierre límite (Time-bound). Esta rigurosidad asegura la completa trazabilidad técnica del proyecto para la gestión de su ejecución iterativa y comprobación de su éxito al término del congreso.
+    </div>
+</div>
+
+</body>
+</html>

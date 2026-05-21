@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Árbol de Problemas Vertical - Ingeniería de Sistemas UNTELS</title>
+    <style>
+        /* CSS Estructural - Diseño de Árbol Jerárquico Vertical */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding: 25px;
+            overflow-x: auto;
+        }
+
+        .main-container {
+            min-width: 1450px;
+            max-width: 1750px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Membrete Oficial UNTELS */
+        .academic-header {
+            text-align: center;
+            border-bottom: 4px double #1e293b;
+            padding-bottom: 15px;
+            margin-bottom: 35px;
+        }
+
+        .academic-header h1 {
+            font-size: 22pt;
+            color: #0f172a;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .academic-header h2 {
+            font-size: 14pt;
+            color: #475569;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .academic-header .meta {
+            font-size: 10pt;
+            color: #94a3b8;
+            font-style: italic;
+            margin-top: 6px;
+        }
+
+        .section-tag {
+            background-color: #0f172a;
+            color: white;
+            padding: 10px 15px;
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3b82f6;
+        }
+
+        /* LEYENDA */
+        .legend-bar {
+            display: flex;
+            gap: 20px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 9.5pt;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .color-box { width: 15px; height: 15px; border-radius: 3px; }
+
+        /* ==========================================
+           CONTENEDOR GLOBAL DEL ÁRBOL VERTICAL
+           ========================================== */
+        .tree-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Estructura de Filas Jerárquicas */
+        .tree-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Líneas Conectoras Verticales */
+        .connector-row {
+            width: 100%;
+            height: 30px;
+            position: relative;
+        }
+
+        /* Tarjeta Genérica de Nodo */
+        .node-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .node-id {
+            font-size: 8.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .node-text {
+            font-size: 9.5pt;
+            line-height: 1.4;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .stakeholder {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 8pt;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: auto;
+        }
+
+        /* 1. SECCIÓN EFECTOS (ARRIBA - Paleta Roja/Gris) */
+        .efectos-indirectos .node-card {
+            width: 180px;
+            border: 1.5px solid #94a3b8;
+            border-top: 4px solid #64748b;
+            background-color: #f8fafc;
+        }
+        .efectos-indirectos .node-id { color: #475569; }
+
+        .efectos-directos .node-card {
+            width: 270px;
+            border: 2px solid #fca5a5;
+            border-top: 5px solid #ef4444;
+        }
+        .efectos-directos .node-id { color: #b91c1c; }
+
+        /* 2. SECCIÓN TRONCO: PROBLEMA CENTRAL (CENTRO) */
+        .problema-central-row {
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .problema-card {
+            width: 650px;
+            background-color: #fef2f2;
+            border: 3px solid #dc2626;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.1);
+        }
+        .problema-card .node-id {
+            color: #ffffff;
+            background-color: #dc2626;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 10pt;
+            letter-spacing: 0.5px;
+        }
+        .problema-card .node-text {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #7f1d1d;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* 3. SECCIÓN CAUSAS (ABAJO - Paleta Azul/Celeste) */
+        .causas-directas .node-card {
+            width: 320px;
+            border: 2px solid #93c5fd;
+            border-top: 5px solid #3b82f6;
+            background-color: #f0f7ff;
+        }
+        .causas-directas .node-id { color: #1d4ed8; }
+
+        .causas-indirectas .node-card {
+            width: 165px;
+            border: 1.5px solid #cbd5e1;
+            border-top: 4px solid #60a5fa;
+            background-color: #f8fafc;
+        }
+        .causas-indirectas .node-id { color: #2563eb; font-style: italic; }
+
+
+        /* ==========================================
+           SISTEMA DE LÍNEAS EN CSS (DISEÑO DE RED)
+           ========================================== */
+        
+        /* Líneas que bajan de los Efectos Indirectos a Directos */
+        .line-ind-dir {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+        /* Dibujamos ejes verticales estándar usando borders en pseudo-elementos */
+        .line-vertical-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background-color: #cbd5e1;
+        }
+        .line-vertical-center.red-line {
+            background-color: #fca5a5;
+        }
+
+        /* Bloque de Validación Metodológica */
+        .academic-footer {
+            margin-top: 40px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #2563eb;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 10pt;
+            color: #334155;
+            line-height: 1.5;
+        }
+        .academic-footer strong {
+            color: #0f172a;
+            display: block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        /* Contenedores de Sub-Columnas para mantener la verticalidad perfecta */
+        .pillar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+        }
+        .sub-tier {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- Encabezado Académico -->
+    <div class="academic-header">
+        <h1>Universidad Nacional Tecnológica de Lima Sur (UNTELS)</h1>
+        <h2>Ingeniería de Sistemas | Formulación y Evaluación de Proyectos de TI (Parcial 2026-II)</h2>
+        <div class="meta">Estructura Avanzada de Matriz de Causalidad Orgánica — Caso: Congreso Agile Mindset</div>
+    </div>
+
+    <div class="section-tag">
+        Representación Estricta del Árbol de Problemas (Efectos Arriba ▲ / Causas Abajo ▼)
+    </div>
+
+    <!-- Leyenda Metodológica -->
+    <div class="legend-bar">
+        <div class="legend-item"><div class="color-box" style="background-color: #64748b;"></div><span>Efectos Indirectos (Meta-Impacto)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #ef4444;"></div><span>Efectos Directos (Consecuencias)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #dc2626;"></div><span>PROBLEMA CENTRAL (Tronco)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #3b82f6;"></div><span>Causas Directas (Pilares Base)</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: #60a5fa;"></div><span>Causas Indirectas (Raíces Profundas)</span></div>
+    </div>
+
+    <!-- ======================================================================
+         CONSTRUCCIÓN DEL ÁRBOL JERÁRQUICO VERTICAL BIUNÍVOCO
+         ====================================================================== -->
+    <div class="tree-layout">
+
+        <!-- NIVEL 4: EFECTOS INDIRECTOS (EXTREMO SUPERIOR) -->
+        <div class="tree-row efectos-indirectos">
+            <!-- Bloque ED1 -->
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card">
+                    <span class="node-id">Ef. Indirecto 1.1</span>
+                    <p class="node-text">Exclusión en primeros filtros de reclutamiento de empresas software top.</p>
+                    <span class="stakeholder">Empresas Empleadoras</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Ef. Indirecto 1.2</span>
+                    <p class="node-text">Descenso en indicadores institucionales de titulación acreditada.</p>
+                    <span class="stakeholder">Dirección de Escuela</span>
+                </div>
+            </div>
+            <!-- Bloque ED2 -->
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card" style="width: 100%;">
+                    <span class="node-id">Ef. Indirecto 2.1</span>
+                    <p class="node-text">Aumento drástico de costos y Lead Time corporativo en capacitaciones de nivelación.</p>
+                    <span class="stakeholder">Empresas Tech · Gremios</span>
+                </div>
+            </div>
+            <!-- Bloque ED3 -->
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card" style="width: 31%;">
+                    <span class="node-id">Ef. Ind. 3.1</span>
+                    <p class="node-text">Observaciones críticas en auditorías ICACIT / SUNEDU.</p>
+                    <span class="stakeholder">MINEDU</span>
+                </div>
+                <div class="node-card" style="width: 31%;">
+                    <span class="node-id">Ef. Ind. 3.2</span>
+                    <p class="node-text">Reducción de postulantes con alto potencial técnico.</p>
+                    <span class="stakeholder">Comunidad Acad.</span>
+                </div>
+                <div class="node-card" style="width: 31%;">
+                    <span class="node-id">Ef. Ind. 3.3</span>
+                    <p class="node-text">Perpetuación de enfoques docentes rígidos sin innovación.</p>
+                    <span class="stakeholder">Docentes</span>
+                </div>
+            </div>
+            <!-- Bloque ED4 -->
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card">
+                    <span class="node-id">Ef. Indirecto 4.1</span>
+                    <p class="node-text">Subutilización crónica de laboratorios y licencias en la nube provistas.</p>
+                    <span class="stakeholder">Área TI · Soporte</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Ef. Indirecto 4.2</span>
+                    <p class="node-text">Pérdida de capital semilla y fondos externos para startups.</p>
+                    <span class="stakeholder">Autoridades</span>
+                </div>
+            </div>
+            <!-- Bloque ED5 -->
+            <div class="sub-tier" style="width: 270px;">
+                <div class="node-card" style="width: 100%;">
+                    <span class="node-id">Ef. Indirecto 5.1</span>
+                    <p class="node-text">Frustración familiar por lento retorno de inversión en educación superior.</p>
+                    <span class="stakeholder">Familias</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LINEAS DE FLUJO EFECTOS -->
+        <div class="connector-row"><div class="line-vertical-center"></div></div>
+
+        <!-- NIVEL 3: EFECTOS DIRECTOS (RAMAS RAMIFICADAS) -->
+        <div class="tree-row efectos-directos">
+            <div class="node-card">
+                <span class="node-id">Efecto Directo 1</span>
+                <p class="node-text">Desinterés sistemático y baja tasa de aprobación en certificaciones ágiles internacionales.</p>
+                <span class="stakeholder">Egresados · Estudiantes</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Efecto Directo 2</span>
+                <p class="node-text">Graduados con severas brechas competenciales operativas al ingresar a células ágiles reales.</p>
+                <span class="stakeholder">Empresas Tech</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Efecto Directo 3</span>
+                <p class="node-text">Obsolescencia y desconexión metodológica del plan de estudios frente al ecosistema del software.</p>
+                <span class="stakeholder">Docentes · Autoridades</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Efecto Directo 4</span>
+                <p class="node-text">Baja tasa de participación estudiantil en hackathons y dinámicas de co-creación tecnológica.</p>
+                <span class="stakeholder">Equipo Org. · Alumnos</span>
+            </div>
+            <div class="node-card">
+                <span class="node-id">Efecto Directo 5</span>
+                <p class="node-text">Contracción del impacto social y valor transferido en proyectos de extensión hacia Lima Sur.</p>
+                <span class="stakeholder">Sociedad Civil</span>
+            </div>
+        </div>
+
+        <!-- LÍNEAS AL TRONCO -->
+        <div class="connector-row"><div class="line-vertical-center red-line"></div></div>
+
+        <!-- ====================================================================== -->
+        <!-- NIVEL 2: TRONCO DEL ÁRBOL - PROBLEMA CENTRAL (EJE PIVOTE NEURAL) -->
+        <!-- ====================================================================== -->
+        <div class="tree-row problema-central-row">
+            <div class="node-card problema-card">
+                <span class="node-id">⚠️ PROBLEMA CENTRAL (TRONCO)</span>
+                <div class="node-text">
+                    Los estudiantes de Ingeniería de Sistemas de la UNTELS carecen de competencias prácticas y mentalidad ágil para gestionar proyectos tecnológicos en entornos empresariales reales.
+                </div>
+            </div>
+        </div>
+
+        <!-- LÍNEAS A LAS CAUSAS -->
+        <div class="connector-row"><div class="line-vertical-center red-line"></div></div>
+
+        <!-- NIVEL 1: CAUSAS DIRECTAS (PILARES DEL ORIGEN) -->
+        <div class="tree-row causas-directas">
+            <!-- PILAR 1 -->
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Causa Directa 1 (Procesos)</span>
+                    <p class="node-text">Malla curricular rígida orientada a marcos tradicionales sin enfoque en entregables iterativos.</p>
+                    <span class="stakeholder">Docentes · Autoridades</span>
+                </div>
+            </div>
+            <!-- PILAR 2 -->
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Causa Directa 2 (Infraestructura)</span>
+                    <p class="node-text">Carencia de plataformas, laboratorios y espacios co-curriculares para simulaciones ágiles.</p>
+                    <span class="stakeholder">Coordinadores · Área TI</span>
+                </div>
+            </div>
+            <!-- PILAR 3 -->
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Causa Directa 3 (Vinculación)</span>
+                    <p class="node-text">Aislamiento institucional y escasa articulación estratégica con el sector empresarial de desarrollo software.</p>
+                    <span class="stakeholder">Autoridades · Empresas Tech</span>
+                </div>
+            </div>
+            <!-- PILAR 4 -->
+            <div class="pillar-group">
+                <div class="node-card">
+                    <span class="node-id">Causa Directa 4 (Cultura)</span>
+                    <p class="node-text">Baja tracción de comunidades de práctica tecnológica y marcada apatía estudiantil ante dinámicas disruptivas.</p>
+                    <span class="stakeholder">Estudiantes · Equipo Org.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LÍNEAS DE FLUJO CAUSAS INDIRECTAS -->
+        <div class="connector-row"><div class="line-vertical-center"></div></div>
+
+        <!-- NIVEL 0: CAUSAS INDIRECTAS / RAÍCES PROFUNDAS (EXTREMO INFERIOR) -->
+        <div class="tree-row causas-indirectas">
+            <!-- Subcausas Pilar 1 -->
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Subcausa 1.1</span>
+                    <p class="node-text">Docentes con escasa actualización y certificación en frameworks ágiles (≤30% activos).</p>
+                    <span class="stakeholder">Docentes</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Subcausa 1.2</span>
+                    <p class="node-text">Sílabos con enfoques evaluativos tradicionales basados en densas memorias teóricas.</p>
+                    <span class="stakeholder">Docentes · Autoridades</span>
+                </div>
+            </div>
+
+            <!-- Subcausas Pilar 2 -->
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Subcausa 2.1</span>
+                    <p class="node-text">Falta de fondos asignados y burocracia rígida para eventos prácticos de escala congreso.</p>
+                    <span class="stakeholder">Autoridades · Finanzas</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Subcausa 2.2</span>
+                    <p class="node-text">Infraestructura de red sin herramientas colaborativas licenciadas (Jira, Miro, DevOps).</p>
+                    <span class="stakeholder">Área TI</span>
+                </div>
+            </div>
+
+            <!-- Subcausas Pilar 3 -->
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Subcausa 3.1</span>
+                    <p class="node-text">Ausencia de convenios de cooperación activos que inyecten casos reales a las aulas.</p>
+                    <span class="stakeholder">Autoridades</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Subcausa 3.2</span>
+                    <p class="node-text">Inexistencia de una bolsa de talento articulada para recoger feedback del mercado laboral TI.</p>
+                    <span class="stakeholder">Administración · Empresas</span>
+                </div>
+            </div>
+
+            <!-- Subcausas Pilar 4 -->
+            <div class="sub-tier" style="width: 340px;">
+                <div class="node-card">
+                    <span class="node-id">Subcausa 4.1</span>
+                    <p class="node-text">Alta sobrecarga académica en cursos tradicionales que limita el liderazgo de co-creación.</p>
+                    <span class="stakeholder">Estudiantes</span>
+                </div>
+                <div class="node-card">
+                    <span class="node-id">Subcausa 4.2</span>
+                    <p class="node-text">Desconocimiento generalizado del alumnado sobre frameworks de producto (Lean Startup/Discovery).</p>
+                    <span class="stakeholder">Equipo Org. · Alumnos</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Validación Metodológica Exigida -->
+    <div class="academic-footer">
+        <strong>Validación y Rigor de Ingeniería — Trazabilidad Vertical Estricta (Escuela UNTELS)</strong>
+        Este panel consolida la topología vertical pura del Árbol de Problemas bajo el marco metodológico institucional. El flujo se organiza de manera ascendente: las 8 raíces profundas (Causas Indirectas, Nivel 0) alimentan y sostienen los 4 pilares estructurales (Causas Directas, Nivel 1), los cuales configuran de forma concurrente el Problema Central (Tronco, Nivel 2). Como consecuencia inevitable, el problema central detona verticalmente hacia arriba los 5 frentes de impacto inmediato (Efectos Directos, Nivel 3), ramificándose de manera asimétrica (Relación 1:N no uniforme) en sus respectivas ramificaciones sectoriales y familiares (Efectos Indirectos, Nivel 4). Cada nodo mapea y asocia explícitamente a su stakeholder de la Matriz PII, garantizando una consistencia del 100% para la posterior inversión analítica a Objetivos SMART.
+    </div>
+</div>
+
+</body>
+</html>
