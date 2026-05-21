@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import ActorsView from '@/views/ActorsView.vue'
-import AnalysisView from '@/views/AnalysisView.vue'
-import ProblemTreeView from '@/views/ProblemTreeView.vue'
-import ObjectiveTreeView from '@/views/ObjectiveTreeView.vue'
-import PrototypeView from '@/views/PrototypeView.vue'
+import HomeView from '../views/HomeView.vue'
+import ActorsView from '../views/ActorsView.vue'
+import AnalysisView from '../views/AnalysisView.vue'
+import ProblemTreeView from '../views/ProblemTreeView.vue'
+import ObjectiveTreeView from '../views/ObjectiveTreeView.vue'
+import PrototypeView from '../views/PrototypeView.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
