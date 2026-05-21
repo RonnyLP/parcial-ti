@@ -174,10 +174,10 @@ const audience = [
 ]
 
 const members = [
-  'Valentina Torres',
-  'Andrés Morales',
-  'Laura Jiménez',
-  'Santiago Ruiz',
+  'Molina Vera, Marcelo Samuel',
+  'Perez Damian, Junior Joel',
+  'Pumaricra Meneses, Ronny Luis',
+  'Roncal Saravia, Jorge Rafael',
 ]
 
 const agenda = [
